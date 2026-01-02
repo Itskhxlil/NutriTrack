@@ -80,8 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchFoodData(query) {
         try {
-            // Fetch 5 results for auto-complete
-            const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=5`);
+            // Show loading state
+            searchResults.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+            searchResults.style.display = 'block';
+
+            // Fetch optimized results (limit fields)
+            const fields = 'product_name,nutriments,_id';
+            const res = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${query}&search_simple=1&action=process&json=1&page_size=5&fields=${fields}`);
+
+            if (!res.ok) throw new Error('Network response was not ok');
+
             const data = await res.json();
 
             searchResults.innerHTML = '';
@@ -91,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const div = document.createElement('div');
                     div.className = 'search-result-item';
                     const name = product.product_name || 'Unknown Product';
-                    const cals = product.nutriments['energy-kcal_100g'] || 0;
+                    const cals = product.nutriments['energy-kcal_100g'] || product.nutriments.energy_100g || 0;
 
                     div.innerHTML = `<div><strong>${name}</strong></div><div>${Math.round(cals)} kcal/100g</div>`;
 
@@ -100,10 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 searchResults.style.display = 'block';
             } else {
-                searchResults.style.display = 'none';
+                searchResults.innerHTML = '<div class="loading">No results found</div>';
+                setTimeout(() => searchResults.style.display = 'none', 2000);
             }
         } catch (err) {
             console.error("Failed to fetch food data", err);
+            searchResults.innerHTML = '<div class="loading">Error fetching data</div>';
         }
     }
 

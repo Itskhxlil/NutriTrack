@@ -199,4 +199,46 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.fill.carb').style.width = Math.min((dailyNutrients.carbs / goals.carbs) * 100, 100) + '%';
         document.querySelector('.fill.fat').style.width = Math.min((dailyNutrients.fat / goals.fat) * 100, 100) + '%';
     }
+
+    // Water Logic
+    let waterGlasses = 0;
+    const waterGoal = 8;
+    const addWaterBtn = document.getElementById('addWaterBtn');
+    const resetWaterBtn = document.getElementById('resetWaterBtn');
+    const waterFill = document.getElementById('waterFill');
+    const waterCount = document.getElementById('waterCount');
+
+    addWaterBtn.onclick = () => {
+        if (waterGlasses < waterGoal) {
+            waterGlasses++;
+            updateWaterUI();
+        }
+    };
+
+    resetWaterBtn.onclick = () => {
+        waterGlasses = 0;
+        updateWaterUI();
+    };
+
+    function updateWaterUI() {
+        waterCount.innerText = waterGlasses;
+        const percent = (waterGlasses / waterGoal) * 100;
+        waterFill.style.height = `${percent}%`;
+
+        if (waterGlasses > 0) {
+            resetWaterBtn.style.display = 'block';
+        } else {
+            resetWaterBtn.style.display = 'none';
+        }
+
+        if (waterGlasses === waterGoal) {
+            addWaterBtn.disabled = true;
+            addWaterBtn.innerText = 'Goal Reached!';
+            addWaterBtn.style.background = '#10b981';
+        } else {
+            addWaterBtn.disabled = false;
+            addWaterBtn.innerHTML = '<i class="fas fa-plus"></i> Drink';
+            addWaterBtn.style.background = '#3b82f6';
+        }
+    }
 });

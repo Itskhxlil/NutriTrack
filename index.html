@@ -117,13 +117,21 @@
                 </div>
 
                 <!-- Water Card -->
+                <!-- Water Card -->
                 <div class="card water-card">
                     <h3>Hydration</h3>
-                    <div class="water-glass">
-                        <i class="fas fa-tint"></i>
-                        <span>0 / 8 Glasses</span>
+                    <div class="water-glass-container">
+                        <div class="glass">
+                            <div class="water-fill" id="waterFill"></div>
+                        </div>
+                        <div class="water-info">
+                            <span id="waterCount">0</span> / 8
+                            <small>Glasses</small>
+                        </div>
                     </div>
-                    <button class="water-btn">+ Add Water</button>
+                    <button class="water-btn" id="addWaterBtn"><i class="fas fa-plus"></i> Drink</button>
+                    <button class="reset-water" id="resetWaterBtn"
+                        style="display:none; margin-top:5px; background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.8rem;">Reset</button>
                 </div>
             </section>
 

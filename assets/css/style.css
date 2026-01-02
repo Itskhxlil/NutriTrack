@@ -428,3 +428,80 @@ body {
     color: var(--primary);
     margin-right: 5px;
 }
+
+/* Water Tracker */
+.water-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.water-glass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.glass {
+    width: 60px;
+    height: 90px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: none;
+    border-radius: 0 0 15px 15px;
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+    margin-bottom: 10px;
+}
+
+.water-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    /* Dynamic */
+    background: #3b82f6;
+    transition: height 0.5s ease-in-out;
+    opacity: 0.8;
+}
+
+.water-info {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.water-info small {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: var(--text-muted);
+}
+
+.water-btn {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.water-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.water-btn:active {
+    transform: translateY(0);
+}

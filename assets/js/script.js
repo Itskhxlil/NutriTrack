@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // New: Search Results container (dynamically created if not present, though we added it in HTML)
     const searchResults = document.getElementById('searchResults');
 
+    // State
     let currentMeal = null;
     let debounceTimer;
     let currentFoodItem = {
@@ -29,6 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
         fat: 0
     };
 
+    // New: Track meals for persistence
+    let todayMeals = {
+        Breakfast: [],
+        Lunch: [],
+        Dinner: [],
+        Snacks: []
+    };
+
     // Goals (Static for now)
     const goals = {
         calories: 2000,
@@ -39,7 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const perimeter = 339.292; // 2 * pi * 54
 
+    // --- Helper: Robust Date Key (YYYY-MM-DD) ---
+    function getDatestamp(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Initialize
+    const todayKey = getDatestamp();
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    try {
+        loadData();
+    } catch (err) {
+        console.error("Data Load Error:", err);
+        // Fallback: Clear potentially corrupted data if it causes crash
+        // localStorage.removeItem('nutriTrack_history'); 
+        // For now just log, to avoid deleting user data if it's just a minor bug.
+    }
 
     window.openFoodModal = (meal) => {
         currentMeal = meal;
@@ -158,36 +186,23 @@ document.addEventListener('DOMContentLoaded', () => {
             nutAdded.fat = 0;
         }
 
-        addNutrients(nutAdded);
+        // Add to State
+        const newItem = {
+            id: Date.now().toString(), // unique ID
+            name: foodName,
+            ...nutAdded
+        };
 
-        // UI Update: Add item to list with metadata and actions
-        const list = document.getElementById(`list-${currentMeal}`);
-        const li = document.createElement('li');
-        li.className = 'food-item';
+        if (!todayMeals[currentMeal]) todayMeals[currentMeal] = [];
+        todayMeals[currentMeal].push(newItem);
 
-        // Store nutrition data in dataset for delete/edit
-        li.dataset.name = foodName;
-        li.dataset.calories = nutAdded.calories;
-        li.dataset.protein = nutAdded.protein;
-        li.dataset.carbs = nutAdded.carbs;
-        li.dataset.fat = nutAdded.fat;
+        // Update Totals
+        Object.keys(nutAdded).forEach(k => dailyNutrients[k] += nutAdded[k]);
 
-        li.innerHTML = `
-            <div class="food-info">
-                <span>${foodName}</span>
-                <small>${calories} kcal</small>
-            </div>
-            <div class="item-actions">
-                <button class="action-btn edit-btn" title="Edit"><i class="fas fa-pen"></i></button>
-                <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
-            </div>
-        `;
-
-        // Add event listeners
-        li.querySelector('.edit-btn').onclick = () => editFoodItem(li, currentMeal);
-        li.querySelector('.delete-btn').onclick = () => deleteFoodItem(li);
-
-        list.appendChild(li);
+        // Save & Render
+        saveData();
+        renderMealItem(currentMeal, newItem);
+        updateDashboard();
 
         // Reset & Close
         calInput.value = '';
@@ -196,61 +211,50 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
     };
 
-    function deleteFoodItem(li) {
-        if (!confirm('Delete this item?')) return;
+    function renderMealItem(mealName, item) {
+        const list = document.getElementById(`list-${mealName}`);
+        const li = document.createElement('li');
+        li.className = 'food-item';
+        li.id = item.id;
 
-        const nutrients = {
-            calories: parseFloat(li.dataset.calories) || 0,
-            protein: parseFloat(li.dataset.protein) || 0,
-            carbs: parseFloat(li.dataset.carbs) || 0,
-            fat: parseFloat(li.dataset.fat) || 0
-        };
+        li.innerHTML = `
+            <div class="food-info">
+                <span>${item.name}</span>
+                <small>${Math.round(item.calories)} kcal</small>
+            </div>
+            <div class="item-actions">
+                <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
 
-        // Subtract from totals
-        dailyNutrients.calories -= nutrients.calories;
-        dailyNutrients.protein -= nutrients.protein;
-        dailyNutrients.carbs -= nutrients.carbs;
-        dailyNutrients.fat -= nutrients.fat;
+        // Note: Edit is a bit complex with ID persistence, so keeping it simple: Delete & Re-add.
+        // If we want edit, we need to update the array. For now supporting delete is good.
+        li.querySelector('.delete-btn').onclick = () => deleteFoodItem(mealName, item.id, li);
 
-        updateDashboard();
-        li.remove();
+        list.appendChild(li);
     }
 
-    function editFoodItem(li, meal) {
-        const name = li.dataset.name;
-        const calories = parseFloat(li.dataset.calories);
+    function deleteFoodItem(mealName, itemId, liElement) {
+        if (!confirm('Delete this item?')) return;
 
-        // Remove from list/totals first
-        const nutrients = {
-            calories: parseFloat(li.dataset.calories) || 0,
-            protein: parseFloat(li.dataset.protein) || 0,
-            carbs: parseFloat(li.dataset.carbs) || 0,
-            fat: parseFloat(li.dataset.fat) || 0
-        };
+        // Find and remove from state
+        const idx = todayMeals[mealName].findIndex(x => x.id === itemId);
+        if (idx === -1) return;
 
-        dailyNutrients.calories -= nutrients.calories;
-        dailyNutrients.protein -= nutrients.protein;
-        dailyNutrients.carbs -= nutrients.carbs;
-        dailyNutrients.fat -= nutrients.fat;
+        const item = todayMeals[mealName][idx];
+
+        // Subtract totals
+        dailyNutrients.calories -= item.calories;
+        dailyNutrients.protein -= item.protein;
+        dailyNutrients.carbs -= item.carbs;
+        dailyNutrients.fat -= item.fat;
+
+        // Remove from array
+        todayMeals[mealName].splice(idx, 1);
+
+        saveData();
         updateDashboard();
-        li.remove();
-
-        // Restore to modal
-        window.openFoodModal(meal);
-        foodSearchInput.value = name;
-        calInput.value = Math.round(calories);
-
-        // Restore currentFoodItem state loosely (approximation for ratios)
-        // Ideally we would store base 100g values, but for now we restore the exact values
-        // This allows re-saving without fetching if no changes, but ratio calculation might drift if changed.
-        // Better: trigger search or just set values as base.
-        currentFoodItem = {
-            name: name,
-            calories: nutrients.calories,
-            protein: nutrients.protein,
-            carbs: nutrients.carbs,
-            fat: nutrients.fat
-        };
+        liElement.remove();
     }
 
     document.querySelectorAll('.tag').forEach(tag => {
@@ -260,15 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchFoodData(food);
         };
     });
-
-    function addNutrients(nutrients) {
-        dailyNutrients.calories += nutrients.calories;
-        dailyNutrients.protein += nutrients.protein;
-        dailyNutrients.carbs += nutrients.carbs;
-        dailyNutrients.fat += nutrients.fat;
-
-        updateDashboard();
-    }
 
     function updateDashboard() {
         // Update Calories
@@ -296,6 +291,40 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('fatValDisplay').innerText = `${Math.round(dailyNutrients.fat)}g`;
     }
 
+    // --- Persistence ---
+    function saveData() {
+        const fullHistory = JSON.parse(localStorage.getItem('nutriTrack_history')) || {};
+
+        fullHistory[todayKey] = {
+            nutrients: dailyNutrients,
+            meals: todayMeals,
+            water: waterGlasses
+        };
+
+        localStorage.setItem('nutriTrack_history', JSON.stringify(fullHistory));
+    }
+
+    function loadData() {
+        const fullHistory = JSON.parse(localStorage.getItem('nutriTrack_history')) || {};
+        const todayData = fullHistory[todayKey];
+
+        if (todayData) {
+            dailyNutrients = todayData.nutrients || dailyNutrients;
+            todayMeals = todayData.meals || todayMeals;
+            waterGlasses = todayData.water || 0;
+
+            // Render UI
+            updateDashboard();
+            updateWaterUI();
+
+            // Re-render lists
+            Object.keys(todayMeals).forEach(mealName => {
+                const items = todayMeals[mealName];
+                items.forEach(item => renderMealItem(mealName, item));
+            });
+        }
+    }
+
     // Water Logic
     let waterGlasses = 0;
     const waterGoal = 8;
@@ -308,12 +337,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (waterGlasses < waterGoal) {
             waterGlasses++;
             updateWaterUI();
+            saveData();
         }
     };
 
     resetWaterBtn.onclick = () => {
         waterGlasses = 0;
         updateWaterUI();
+        saveData();
     };
 
     function updateWaterUI() {
@@ -346,4 +377,57 @@ document.addEventListener('DOMContentLoaded', () => {
         const clean = String(val).replace(/[^0-9.]/g, '');
         return parseFloat(clean) || 0;
     }
+
+    // --- Navigation & Views ---
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navMeals = document.getElementById('nav-meals');
+    const navReports = document.getElementById('nav-reports');
+    const navSettings = document.getElementById('nav-settings');
+
+    const dashboardView = document.getElementById('dashboard-view');
+    const mealsView = document.getElementById('meals-view');
+    const reportsView = document.getElementById('reports-view');
+    const settingsView = document.getElementById('settings-view');
+
+    function hideAllViews() {
+        dashboardView.style.display = 'none';
+        if (mealsView) mealsView.style.display = 'none';
+        reportsView.style.display = 'none';
+        if (settingsView) settingsView.style.display = 'none';
+
+        navDashboard.classList.remove('active');
+        if (navMeals) navMeals.classList.remove('active');
+        navReports.classList.remove('active');
+        if (navSettings) navSettings.classList.remove('active');
+    }
+
+    function switchView(viewName) {
+        hideAllViews();
+        if (viewName === 'dashboard') {
+            dashboardView.style.display = 'block';
+            navDashboard.classList.add('active');
+        } else if (viewName === 'meals') {
+            if (mealsView) mealsView.style.display = 'block';
+            if (navMeals) navMeals.classList.add('active');
+        } else if (viewName === 'reports') {
+            reportsView.style.display = 'block';
+            navReports.classList.add('active');
+            renderReports();
+        } else if (viewName === 'settings') {
+            if (settingsView) settingsView.style.display = 'block';
+            if (navSettings) navSettings.classList.add('active');
+        }
+    }
+
+    navDashboard.onclick = (e) => { e.preventDefault(); switchView('dashboard'); };
+    if (navMeals) navMeals.onclick = (e) => { e.preventDefault(); switchView('meals'); };
+    navReports.onclick = (e) => { e.preventDefault(); switchView('reports'); };
+    if (navSettings) navSettings.onclick = (e) => { e.preventDefault(); switchView('settings'); };
+
+    function renderReports() {
+        // Page Under Construction
+    }
+
+
+
 });

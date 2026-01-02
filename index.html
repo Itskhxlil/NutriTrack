@@ -7,7 +7,7 @@
     <title>NutriTrack - Dashboard</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -21,10 +21,10 @@
             </div>
 
             <nav class="nav-links">
-                <a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
-                <a href="#"><i class="fas fa-utensils"></i> Meals</a>
-                <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
-                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="active" id="nav-dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#" id="nav-meals"><i class="fas fa-utensils"></i> Meals</a>
+                <a href="#" id="nav-reports"><i class="fas fa-chart-line"></i> Reports</a>
+                <a href="#" id="nav-settings"><i class="fas fa-cog"></i> Settings</a>
             </nav>
 
             <div class="user-profile">
@@ -38,167 +38,207 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
-            <header class="top-bar">
-                <div class="welcome-text">
-                    <h1>Hello, Guest! 👋</h1>
-                    <p id="currentDate">Today</p>
-                </div>
-                <div class="header-actions">
-                    <button class="icon-btn"><i class="fas fa-bell"></i></button>
-                    <button class="add-btn" id="openAddModal"><i class="fas fa-plus"></i> Quick Add</button>
-                </div>
-            </header>
-
-            <!-- Stats Row -->
-            <section class="stats-overview">
-                <!-- Calories Card -->
-                <div class="card calorie-card">
-                    <div class="card-header">
-                        <h3>Calories</h3>
-                        <span class="badge">Goal: 2000</span>
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboard-view" class="view-section">
+                <!-- Header -->
+                <header class="top-bar">
+                    <div class="welcome-text">
+                        <h1>Hello, Guest! 👋</h1>
+                        <p id="currentDate">Today</p>
                     </div>
-                    <div class="ring-container">
-                        <div class="ring">
-                            <svg width="120" height="120">
-                                <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
-                                <circle class="ring-progress" cx="60" cy="60" r="54"></circle>
-                            </svg>
-                            <div class="ring-text">
-                                <span class="big-num" id="calRemaining">2000</span>
-                                <small>Left</small>
-                            </div>
-                        </div>
-                        <div class="ring-legends">
-                            <div class="legend-item">
-                                <span class="dot eaten"></span>
-                                <small>Eaten: <b id="calConsumed">0</b></small>
-                            </div>
-                            <div class="legend-item">
-                                <span class="dot burned"></span>
-                                <small>Burned: <b>0</b></small>
-                            </div>
-                        </div>
+                    <div class="header-actions">
+                        <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                        <button class="add-btn" id="openAddModal"><i class="fas fa-plus"></i> Quick Add</button>
                     </div>
-                </div>
+                </header>
 
-                <!-- Macros Card -->
-                <div class="card macro-card">
-                    <h3>Macronutrients</h3>
-                    <div class="macro-rings-container">
-                        <!-- Protein -->
-                        <div class="macro-ring-item">
-                            <div class="mini-ring-wrapper">
-                                <svg width="80" height="80">
-                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
-                                    <circle class="mini-ring-progress prot" id="protRing" cx="40" cy="40" r="30">
-                                    </circle>
+                <!-- Stats Row -->
+                <section class="stats-overview">
+                    <!-- Calories Card -->
+                    <div class="card calorie-card">
+                        <div class="card-header">
+                            <h3>Calories</h3>
+                            <span class="badge">Goal: 2000</span>
+                        </div>
+                        <div class="ring-container">
+                            <div class="ring">
+                                <svg width="120" height="120">
+                                    <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
+                                    <circle class="ring-progress" cx="60" cy="60" r="54"></circle>
                                 </svg>
-                                <div class="mini-ring-val" id="protValDisplay">0g</div>
+                                <div class="ring-text">
+                                    <span class="big-num" id="calRemaining">2000</span>
+                                    <small>Left</small>
+                                </div>
                             </div>
-                            <span class="mini-ring-label">Protein</span>
-                        </div>
-
-                        <!-- Carbs -->
-                        <div class="macro-ring-item">
-                            <div class="mini-ring-wrapper">
-                                <svg width="80" height="80">
-                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
-                                    <circle class="mini-ring-progress carb" id="carbRing" cx="40" cy="40" r="30">
-                                    </circle>
-                                </svg>
-                                <div class="mini-ring-val" id="carbValDisplay">0g</div>
+                            <div class="ring-legends">
+                                <div class="legend-item">
+                                    <span class="dot eaten"></span>
+                                    <small>Eaten: <b id="calConsumed">0</b></small>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="dot burned"></span>
+                                    <small>Burned: <b>0</b></small>
+                                </div>
                             </div>
-                            <span class="mini-ring-label">Carbs</span>
-                        </div>
-
-                        <!-- Fat -->
-                        <div class="macro-ring-item">
-                            <div class="mini-ring-wrapper">
-                                <svg width="80" height="80">
-                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
-                                    <circle class="mini-ring-progress fat" id="fatRing" cx="40" cy="40" r="30"></circle>
-                                </svg>
-                                <div class="mini-ring-val" id="fatValDisplay">0g</div>
-                            </div>
-                            <span class="mini-ring-label">Fat</span>
                         </div>
                     </div>
+
+                    <!-- Macros Card -->
+                    <div class="card macro-card">
+                        <h3>Macronutrients</h3>
+                        <div class="macro-rings-container">
+                            <!-- Protein -->
+                            <div class="macro-ring-item">
+                                <div class="mini-ring-wrapper">
+                                    <svg width="80" height="80">
+                                        <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                        <circle class="mini-ring-progress prot" id="protRing" cx="40" cy="40" r="30">
+                                        </circle>
+                                    </svg>
+                                    <div class="mini-ring-val" id="protValDisplay">0g</div>
+                                </div>
+                                <span class="mini-ring-label">Protein</span>
+                            </div>
+
+                            <!-- Carbs -->
+                            <div class="macro-ring-item">
+                                <div class="mini-ring-wrapper">
+                                    <svg width="80" height="80">
+                                        <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                        <circle class="mini-ring-progress carb" id="carbRing" cx="40" cy="40" r="30">
+                                        </circle>
+                                    </svg>
+                                    <div class="mini-ring-val" id="carbValDisplay">0g</div>
+                                </div>
+                                <span class="mini-ring-label">Carbs</span>
+                            </div>
+
+                            <!-- Fat -->
+                            <div class="macro-ring-item">
+                                <div class="mini-ring-wrapper">
+                                    <svg width="80" height="80">
+                                        <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                        <circle class="mini-ring-progress fat" id="fatRing" cx="40" cy="40" r="30">
+                                        </circle>
+                                    </svg>
+                                    <div class="mini-ring-val" id="fatValDisplay">0g</div>
+                                </div>
+                                <span class="mini-ring-label">Fat</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Water Card -->
+                    <div class="card water-card">
+                        <h3>Hydration</h3>
+                        <div class="water-glass-container">
+                            <div class="glass">
+                                <div class="water-fill" id="waterFill"></div>
+                            </div>
+                            <div class="water-info">
+                                <span id="waterCount">0</span> / 8
+                                <small>Glasses</small>
+                            </div>
+                        </div>
+                        <button class="water-btn" id="addWaterBtn"><i class="fas fa-plus"></i> Drink</button>
+                        <button class="reset-water" id="resetWaterBtn"
+                            style="display:none; margin-top:5px; background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.8rem;">Reset</button>
+                    </div>
+                </section>
+
+                <!-- Meal Sections -->
+                <section class="meals-section">
+                    <h3>Today's Meals</h3>
+                    <div class="meals-grid">
+                        <!-- Breakfast -->
+                        <div class="meal-card" data-meal="Breakfast">
+                            <div class="meal-header">
+                                <div class="meal-title">
+                                    <i class="fas fa-coffee"></i> Breakfast
+                                </div>
+                                <button class="add-mini" onclick="openFoodModal('Breakfast')">+</button>
+                            </div>
+                            <ul class="food-list" id="list-Breakfast">
+                                <!-- Items go here -->
+                            </ul>
+                            <div class="meal-footer">0 kcal</div>
+                        </div>
+
+                        <!-- Lunch -->
+                        <div class="meal-card" data-meal="Lunch">
+                            <div class="meal-header">
+                                <div class="meal-title">
+                                    <i class="fas fa-hamburger"></i> Lunch
+                                </div>
+                                <button class="add-mini" onclick="openFoodModal('Lunch')">+</button>
+                            </div>
+                            <ul class="food-list" id="list-Lunch"></ul>
+                            <div class="meal-footer">0 kcal</div>
+                        </div>
+
+                        <!-- Dinner -->
+                        <div class="meal-card" data-meal="Dinner">
+                            <div class="meal-header">
+                                <div class="meal-title">
+                                    <i class="fas fa-moon"></i> Dinner
+                                </div>
+                                <button class="add-mini" onclick="openFoodModal('Dinner')">+</button>
+                            </div>
+                            <ul class="food-list" id="list-Dinner"></ul>
+                            <div class="meal-footer">0 kcal</div>
+                        </div>
+
+                        <!-- Snacks -->
+                        <div class="meal-card" data-meal="Snacks">
+                            <div class="meal-header">
+                                <div class="meal-title">
+                                    <i class="fas fa-cookie-bite"></i> Snacks
+                                </div>
+                                <button class="add-mini" onclick="openFoodModal('Snacks')">+</button>
+                            </div>
+                            <ul class="food-list" id="list-Snacks"></ul>
+                            <div class="meal-footer">0 kcal</div>
+                        </div>
+                    </div>
+                </section>
+            </div> <!-- End Dashboard View -->
+
+            <!-- REPORTS VIEW -->
+            <div id="reports-view" class="view-section" style="display: none;">
+                <header class="top-bar">
+                    <div class="welcome-text">
+                        <h1>Reports</h1>
+                    </div>
+                </header>
+                <div class="reports-container" style="padding: 2rem; text-align: center; color: #94a3b8;">
+                    <p>Page Under Construction</p>
                 </div>
+            </div>
 
-                <!-- Water Card -->
-                <div class="card water-card">
-                    <h3>Hydration</h3>
-                    <div class="water-glass-container">
-                        <div class="glass">
-                            <div class="water-fill" id="waterFill"></div>
-                        </div>
-                        <div class="water-info">
-                            <span id="waterCount">0</span> / 8
-                            <small>Glasses</small>
-                        </div>
+            <!-- MEALS VIEW -->
+            <div id="meals-view" class="view-section" style="display: none;">
+                <header class="top-bar">
+                    <div class="welcome-text">
+                        <h1>Your Meals</h1>
                     </div>
-                    <button class="water-btn" id="addWaterBtn"><i class="fas fa-plus"></i> Drink</button>
-                    <button class="reset-water" id="resetWaterBtn"
-                        style="display:none; margin-top:5px; background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.8rem;">Reset</button>
+                </header>
+                <div class="view-container" style="padding: 2rem; text-align: center; color: #94a3b8;">
+                    <p>Page Under Construction</p>
                 </div>
-            </section>
+            </div>
 
-            <!-- Meal Sections -->
-            <section class="meals-section">
-                <h3>Today's Meals</h3>
-                <div class="meals-grid">
-                    <!-- Breakfast -->
-                    <div class="meal-card" data-meal="Breakfast">
-                        <div class="meal-header">
-                            <div class="meal-title">
-                                <i class="fas fa-coffee"></i> Breakfast
-                            </div>
-                            <button class="add-mini" onclick="openFoodModal('Breakfast')">+</button>
-                        </div>
-                        <ul class="food-list" id="list-Breakfast">
-                            <!-- Items go here -->
-                        </ul>
-                        <div class="meal-footer">0 kcal</div>
+            <!-- SETTINGS VIEW -->
+            <div id="settings-view" class="view-section" style="display: none;">
+                <header class="top-bar">
+                    <div class="welcome-text">
+                        <h1>Settings</h1>
                     </div>
-
-                    <!-- Lunch -->
-                    <div class="meal-card" data-meal="Lunch">
-                        <div class="meal-header">
-                            <div class="meal-title">
-                                <i class="fas fa-hamburger"></i> Lunch
-                            </div>
-                            <button class="add-mini" onclick="openFoodModal('Lunch')">+</button>
-                        </div>
-                        <ul class="food-list" id="list-Lunch"></ul>
-                        <div class="meal-footer">0 kcal</div>
-                    </div>
-
-                    <!-- Dinner -->
-                    <div class="meal-card" data-meal="Dinner">
-                        <div class="meal-header">
-                            <div class="meal-title">
-                                <i class="fas fa-moon"></i> Dinner
-                            </div>
-                            <button class="add-mini" onclick="openFoodModal('Dinner')">+</button>
-                        </div>
-                        <ul class="food-list" id="list-Dinner"></ul>
-                        <div class="meal-footer">0 kcal</div>
-                    </div>
-
-                    <!-- Snacks -->
-                    <div class="meal-card" data-meal="Snacks">
-                        <div class="meal-header">
-                            <div class="meal-title">
-                                <i class="fas fa-cookie-bite"></i> Snacks
-                            </div>
-                            <button class="add-mini" onclick="openFoodModal('Snacks')">+</button>
-                        </div>
-                        <ul class="food-list" id="list-Snacks"></ul>
-                        <div class="meal-footer">0 kcal</div>
-                    </div>
+                </header>
+                <div class="view-container" style="padding: 2rem; text-align: center; color: #94a3b8;">
+                    <p>Page Under Construction</p>
                 </div>
-            </section>
+            </div>
         </main>
     </div>
 

@@ -336,9 +336,48 @@ body {
     font-size: 0.9rem;
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
+    align-items: center;
+    padding: 8px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--text-muted);
+}
+
+.food-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.food-info small {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.edit-btn:hover {
+    color: var(--secondary);
+}
+
+.delete-btn:hover {
+    color: var(--danger);
 }
 
 .meal-footer {

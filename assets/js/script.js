@@ -140,29 +140,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (calories <= 0) return alert('Please enter valid calories');
 
+        let ratio = 0;
         if (currentFoodItem.calories > 0) {
-            const ratio = calories / currentFoodItem.calories;
-            addNutrients({
-                calories: calories,
-                protein: currentFoodItem.protein * ratio,
-                carbs: currentFoodItem.carbs * ratio,
-                fat: currentFoodItem.fat * ratio
-            });
-        } else {
-            // Fallback for custom food with no API data
-            addNutrients({
-                calories: calories,
-                protein: 0,
-                carbs: 0,
-                fat: 0
-            });
+            ratio = calories / currentFoodItem.calories;
         }
 
-        // UI Update: Add item to list
+        const nutAdded = {
+            calories: calories,
+            protein: currentFoodItem.protein * ratio,
+            carbs: currentFoodItem.carbs * ratio,
+            fat: currentFoodItem.fat * ratio
+        };
+
+        if (currentFoodItem.calories <= 0) {
+            nutAdded.protein = 0;
+            nutAdded.carbs = 0;
+            nutAdded.fat = 0;
+        }
+
+        addNutrients(nutAdded);
+
+        // UI Update: Add item to list with metadata and actions
         const list = document.getElementById(`list-${currentMeal}`);
         const li = document.createElement('li');
         li.className = 'food-item';
-        li.innerHTML = `<span>${foodName}</span> <span>${calories} kcal</span>`;
+
+        // Store nutrition data in dataset for delete/edit
+        li.dataset.name = foodName;
+        li.dataset.calories = nutAdded.calories;
+        li.dataset.protein = nutAdded.protein;
+        li.dataset.carbs = nutAdded.carbs;
+        li.dataset.fat = nutAdded.fat;
+
+        li.innerHTML = `
+            <div class="food-info">
+                <span>${foodName}</span>
+                <small>${calories} kcal</small>
+            </div>
+            <div class="item-actions">
+                <button class="action-btn edit-btn" title="Edit"><i class="fas fa-pen"></i></button>
+                <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+
+        // Add event listeners
+        li.querySelector('.edit-btn').onclick = () => editFoodItem(li, currentMeal);
+        li.querySelector('.delete-btn').onclick = () => deleteFoodItem(li);
+
         list.appendChild(li);
 
         // Reset & Close
@@ -171,6 +195,63 @@ document.addEventListener('DOMContentLoaded', () => {
         currentFoodItem = { name: '', calories: 0, protein: 0, carbs: 0, fat: 0 }; // Reset state
         modal.style.display = 'none';
     };
+
+    function deleteFoodItem(li) {
+        if (!confirm('Delete this item?')) return;
+
+        const nutrients = {
+            calories: parseFloat(li.dataset.calories) || 0,
+            protein: parseFloat(li.dataset.protein) || 0,
+            carbs: parseFloat(li.dataset.carbs) || 0,
+            fat: parseFloat(li.dataset.fat) || 0
+        };
+
+        // Subtract from totals
+        dailyNutrients.calories -= nutrients.calories;
+        dailyNutrients.protein -= nutrients.protein;
+        dailyNutrients.carbs -= nutrients.carbs;
+        dailyNutrients.fat -= nutrients.fat;
+
+        updateDashboard();
+        li.remove();
+    }
+
+    function editFoodItem(li, meal) {
+        const name = li.dataset.name;
+        const calories = parseFloat(li.dataset.calories);
+
+        // Remove from list/totals first
+        const nutrients = {
+            calories: parseFloat(li.dataset.calories) || 0,
+            protein: parseFloat(li.dataset.protein) || 0,
+            carbs: parseFloat(li.dataset.carbs) || 0,
+            fat: parseFloat(li.dataset.fat) || 0
+        };
+
+        dailyNutrients.calories -= nutrients.calories;
+        dailyNutrients.protein -= nutrients.protein;
+        dailyNutrients.carbs -= nutrients.carbs;
+        dailyNutrients.fat -= nutrients.fat;
+        updateDashboard();
+        li.remove();
+
+        // Restore to modal
+        window.openFoodModal(meal);
+        foodSearchInput.value = name;
+        calInput.value = Math.round(calories);
+
+        // Restore currentFoodItem state loosely (approximation for ratios)
+        // Ideally we would store base 100g values, but for now we restore the exact values
+        // This allows re-saving without fetching if no changes, but ratio calculation might drift if changed.
+        // Better: trigger search or just set values as base.
+        currentFoodItem = {
+            name: name,
+            calories: nutrients.calories,
+            protein: nutrients.protein,
+            carbs: nutrients.carbs,
+            fat: nutrients.fat
+        };
+    }
 
     document.querySelectorAll('.tag').forEach(tag => {
         tag.onclick = () => {

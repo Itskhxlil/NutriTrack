@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriTrack - Dashboard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fas fa-leaf"></i>
+                <span>NutriTrack</span>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#"><i class="fas fa-utensils"></i> Meals</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+
+            <div class="user-profile">
+                <div class="avatar">G</div>
+                <div class="user-info">
+                    <h4>Guest User</h4>
+                    <small>Basic Plan</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <div class="welcome-text">
+                    <h1>Hello, Guest! 👋</h1>
+                    <p id="currentDate">Today</p>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fas fa-bell"></i></button>
+                    <button class="add-btn" id="openAddModal"><i class="fas fa-plus"></i> Quick Add</button>
+                </div>
+            </header>
+
+            <!-- Stats Row -->
+            <section class="stats-overview">
+                <!-- Calories Card -->
+                <div class="card calorie-card">
+                    <div class="card-header">
+                        <h3>Calories</h3>
+                        <span class="badge">Goal: 2000</span>
+                    </div>
+                    <div class="ring-container">
+                        <div class="ring">
+                            <svg width="120" height="120">
+                                <circle class="ring-bg" cx="60" cy="60" r="54"></circle>
+                                <circle class="ring-progress" cx="60" cy="60" r="54"></circle>
+                            </svg>
+                            <div class="ring-text">
+                                <span class="big-num" id="calRemaining">2000</span>
+                                <small>Left</small>
+                            </div>
+                        </div>
+                        <div class="ring-legends">
+                            <div class="legend-item">
+                                <span class="dot eaten"></span>
+                                <small>Eaten: <b id="calConsumed">0</b></small>
+                            </div>
+                            <div class="legend-item">
+                                <span class="dot burned"></span>
+                                <small>Burned: <b>0</b></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Macros Card -->
+                <div class="card macro-card">
+                    <h3>Macronutrients</h3>
+                    <div class="macro-bars">
+                        <div class="macro-item">
+                            <div class="macro-info">
+                                <span>Protein</span>
+                                <span id="protVal">0g / 150g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill prot" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="macro-item">
+                            <div class="macro-info">
+                                <span>Carbs</span>
+                                <span id="carbVal">0g / 200g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill carb" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="macro-item">
+                            <div class="macro-info">
+                                <span>Fat</span>
+                                <span id="fatVal">0g / 70g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill fat" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Water Card -->
+                <div class="card water-card">
+                    <h3>Hydration</h3>
+                    <div class="water-glass">
+                        <i class="fas fa-tint"></i>
+                        <span>0 / 8 Glasses</span>
+                    </div>
+                    <button class="water-btn">+ Add Water</button>
+                </div>
+            </section>
+
+            <!-- Meal Sections -->
+            <section class="meals-section">
+                <h3>Today's Meals</h3>
+                <div class="meals-grid">
+                    <!-- Breakfast -->
+                    <div class="meal-card" data-meal="Breakfast">
+                        <div class="meal-header">
+                            <div class="meal-title">
+                                <i class="fas fa-coffee"></i> Breakfast
+                            </div>
+                            <button class="add-mini" onclick="openFoodModal('Breakfast')">+</button>
+                        </div>
+                        <ul class="food-list" id="list-Breakfast">
+                            <!-- Items go here -->
+                        </ul>
+                        <div class="meal-footer">0 kcal</div>
+                    </div>
+
+                    <!-- Lunch -->
+                    <div class="meal-card" data-meal="Lunch">
+                        <div class="meal-header">
+                            <div class="meal-title">
+                                <i class="fas fa-hamburger"></i> Lunch
+                            </div>
+                            <button class="add-mini" onclick="openFoodModal('Lunch')">+</button>
+                        </div>
+                        <ul class="food-list" id="list-Lunch"></ul>
+                        <div class="meal-footer">0 kcal</div>
+                    </div>
+
+                    <!-- Dinner -->
+                    <div class="meal-card" data-meal="Dinner">
+                        <div class="meal-header">
+                            <div class="meal-title">
+                                <i class="fas fa-moon"></i> Dinner
+                            </div>
+                            <button class="add-mini" onclick="openFoodModal('Dinner')">+</button>
+                        </div>
+                        <ul class="food-list" id="list-Dinner"></ul>
+                        <div class="meal-footer">0 kcal</div>
+                    </div>
+
+                    <!-- Snacks -->
+                    <div class="meal-card" data-meal="Snacks">
+                        <div class="meal-header">
+                            <div class="meal-title">
+                                <i class="fas fa-cookie-bite"></i> Snacks
+                            </div>
+                            <button class="add-mini" onclick="openFoodModal('Snacks')">+</button>
+                        </div>
+                        <ul class="food-list" id="list-Snacks"></ul>
+                        <div class="meal-footer">0 kcal</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="addFoodModal" class="modal-overlay">
+        <div class="modal-glass">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Food</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="foodSearch" placeholder="Search (e.g., Apple, Egg...)">
+                </div>
+                <!-- Results -->
+                <div class="search-suggestions">
+                    <div class="tag">Apple</div>
+                    <div class="tag">Banana</div>
+                    <div class="tag">Chicken Breast</div>
+                    <div class="tag">Rice</div>
+                </div>
+
+                <div class="food-inputs" style="margin-top: 20px;">
+                    <label>Calories (kcal)</label>
+                    <input type="number" id="calInput" placeholder="0">
+                </div>
+
+                <button class="save-btn" id="saveFoodBtn">Add to Log</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>

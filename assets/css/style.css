@@ -10,6 +10,7 @@
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --danger: #ef4444;
+    --fat-color: #facc15;
 }
 
 * {
@@ -204,29 +205,71 @@ body {
     margin-bottom: 5px;
 }
 
-.progress-bar {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    overflow: hidden;
+/* Macro Rings */
+.macro-rings-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
 }
 
-.fill {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 0.5s;
+.macro-ring-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
 }
 
-.fill.prot {
-    background: var(--secondary);
+.mini-ring-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
 }
 
-.fill.carb {
-    background: var(--accent);
+.mini-ring-wrapper svg {
+    transform: rotate(-90deg);
 }
 
-.fill.fat {
-    background: var(--danger);
+.mini-ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 6;
+}
+
+.mini-ring-progress {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 6;
+    stroke-dasharray: 188.5;
+    /* 2 * pi * 30 */
+    stroke-dashoffset: 188.5;
+    transition: stroke-dashoffset 1s ease;
+    stroke-linecap: round;
+}
+
+.mini-ring-progress.prot {
+    stroke: var(--secondary);
+}
+
+.mini-ring-progress.carb {
+    stroke: var(--accent);
+}
+
+.mini-ring-progress.fat {
+    stroke: var(--fat-color);
+}
+
+.mini-ring-val {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.mini-ring-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
 /* Meals Grid */

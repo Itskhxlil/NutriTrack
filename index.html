@@ -85,33 +85,43 @@
                 <!-- Macros Card -->
                 <div class="card macro-card">
                     <h3>Macronutrients</h3>
-                    <div class="macro-bars">
-                        <div class="macro-item">
-                            <div class="macro-info">
-                                <span>Protein</span>
-                                <span id="protVal">0g / 150g</span>
+                    <div class="macro-rings-container">
+                        <!-- Protein -->
+                        <div class="macro-ring-item">
+                            <div class="mini-ring-wrapper">
+                                <svg width="80" height="80">
+                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="mini-ring-progress prot" id="protRing" cx="40" cy="40" r="30">
+                                    </circle>
+                                </svg>
+                                <div class="mini-ring-val" id="protValDisplay">0g</div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="fill prot" style="width: 0%"></div>
-                            </div>
+                            <span class="mini-ring-label">Protein</span>
                         </div>
-                        <div class="macro-item">
-                            <div class="macro-info">
-                                <span>Carbs</span>
-                                <span id="carbVal">0g / 200g</span>
+
+                        <!-- Carbs -->
+                        <div class="macro-ring-item">
+                            <div class="mini-ring-wrapper">
+                                <svg width="80" height="80">
+                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="mini-ring-progress carb" id="carbRing" cx="40" cy="40" r="30">
+                                    </circle>
+                                </svg>
+                                <div class="mini-ring-val" id="carbValDisplay">0g</div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="fill carb" style="width: 0%"></div>
-                            </div>
+                            <span class="mini-ring-label">Carbs</span>
                         </div>
-                        <div class="macro-item">
-                            <div class="macro-info">
-                                <span>Fat</span>
-                                <span id="fatVal">0g / 70g</span>
+
+                        <!-- Fat -->
+                        <div class="macro-ring-item">
+                            <div class="mini-ring-wrapper">
+                                <svg width="80" height="80">
+                                    <circle class="mini-ring-bg" cx="40" cy="40" r="30"></circle>
+                                    <circle class="mini-ring-progress fat" id="fatRing" cx="40" cy="40" r="30"></circle>
+                                </svg>
+                                <div class="mini-ring-val" id="fatValDisplay">0g</div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="fill fat" style="width: 0%"></div>
-                            </div>
+                            <span class="mini-ring-label">Fat</span>
                         </div>
                     </div>
                 </div>

@@ -112,10 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentFoodItem = {
             name: product.product_name || 'Unknown Food',
-            calories: nutriments['energy-kcal_100g'] || 0,
-            protein: nutriments.proteins_100g || 0,
-            carbs: nutriments.carbohydrates_100g || 0,
-            fat: nutriments.fat_100g || 0
+            calories: parseNutrient(nutriments['energy-kcal_100g']) || parseNutrient(nutriments.energy_100g) || 0,
+            protein: parseNutrient(nutriments.proteins_100g) || parseNutrient(nutriments.proteins) || 0,
+            carbs: parseNutrient(nutriments.carbohydrates_100g) || parseNutrient(nutriments.carbohydrates) || 0,
+            fat: parseNutrient(nutriments.fat_100g) || parseNutrient(nutriments.fat) || parseNutrient(nutriments['saturated-fat_100g']) || 0
         };
 
         foodSearchInput.value = currentFoodItem.name;
@@ -189,15 +189,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const offset = perimeter - (perimeter * percent);
         document.querySelector('.ring-progress').style.strokeDashoffset = offset;
 
-        // Update Macro Text
-        document.getElementById('protVal').innerText = `${Math.round(dailyNutrients.protein)}g / ${goals.protein}g`;
-        document.getElementById('carbVal').innerText = `${Math.round(dailyNutrients.carbs)}g / ${goals.carbs}g`;
-        document.getElementById('fatVal').innerText = `${Math.round(dailyNutrients.fat)}g / ${goals.fat}g`;
+        // Update Macro Rings
+        const miniPerimeter = 188.5; // 2 * pi * 30
 
-        // Update Macro Bars
-        document.querySelector('.fill.prot').style.width = Math.min((dailyNutrients.protein / goals.protein) * 100, 100) + '%';
-        document.querySelector('.fill.carb').style.width = Math.min((dailyNutrients.carbs / goals.carbs) * 100, 100) + '%';
-        document.querySelector('.fill.fat').style.width = Math.min((dailyNutrients.fat / goals.fat) * 100, 100) + '%';
+        const pPercent = Math.min((dailyNutrients.protein / goals.protein), 1);
+        const cPercent = Math.min((dailyNutrients.carbs / goals.carbs), 1);
+        const fPercent = Math.min((dailyNutrients.fat / goals.fat), 1);
+
+        document.getElementById('protRing').style.strokeDashoffset = miniPerimeter - (miniPerimeter * pPercent);
+        document.getElementById('carbRing').style.strokeDashoffset = miniPerimeter - (miniPerimeter * cPercent);
+        document.getElementById('fatRing').style.strokeDashoffset = miniPerimeter - (miniPerimeter * fPercent);
+
+        document.getElementById('protValDisplay').innerText = `${Math.round(dailyNutrients.protein)}g`;
+        document.getElementById('carbValDisplay').innerText = `${Math.round(dailyNutrients.carbs)}g`;
+        document.getElementById('fatValDisplay').innerText = `${Math.round(dailyNutrients.fat)}g`;
     }
 
     // Water Logic
@@ -240,5 +245,14 @@ document.addEventListener('DOMContentLoaded', () => {
             addWaterBtn.innerHTML = '<i class="fas fa-plus"></i> Drink';
             addWaterBtn.style.background = '#3b82f6';
         }
+    }
+
+    // Helper to safely parse API numbers (handles " < 0.1 ", strings etc)
+    function parseNutrient(val) {
+        if (!val) return 0;
+        if (typeof val === 'number') return val;
+        // Remove non-numeric chars except dot
+        const clean = String(val).replace(/[^0-9.]/g, '');
+        return parseFloat(clean) || 0;
     }
 });

@@ -195,7 +195,10 @@
             <div class="modal-body">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="foodSearch" placeholder="Search (e.g., Apple, Egg...)">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" id="foodSearch" placeholder="Search (e.g., Apple, Egg...)">
+                        <div id="searchResults" class="search-results-list"></div>
+                    </div>
                 </div>
                 <!-- Results -->
                 <div class="search-suggestions">

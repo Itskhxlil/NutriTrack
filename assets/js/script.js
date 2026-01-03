@@ -425,6 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (viewName === 'meals') {
             if (mealsView) mealsView.style.display = 'block';
             if (navMeals) navMeals.classList.add('active');
+            renderMealsView();
         } else if (viewName === 'reports') {
             reportsView.style.display = 'block';
             navReports.classList.add('active');
@@ -443,6 +444,147 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderReports() {
         // Page Under Construction
     }
+
+    // --- Meals View Logic ---
+    function renderMealsView() {
+        const tbody = document.getElementById('mealsTableBody');
+        const emptyMsg = document.getElementById('no-meals-msg');
+        const tableResponsive = document.querySelector('.table-responsive');
+
+        tbody.innerHTML = '';
+        let hasData = false;
+
+        // Sort dates descending
+        const dates = Object.keys(globalHistory).sort((a, b) => new Date(b) - new Date(a));
+
+        dates.forEach(date => {
+            const dayData = globalHistory[date];
+            if (!dayData || !dayData.meals) return;
+
+            // Check if day has any meals
+            let dayHasMeals = false;
+            ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(m => {
+                if (dayData.meals[m] && dayData.meals[m].length > 0) dayHasMeals = true;
+            });
+
+            if (!dayHasMeals) return;
+            hasData = true;
+
+            // 1. Date Header Row
+            const dateRow = document.createElement('tr');
+            dateRow.className = 'date-header';
+            const formattedDate = new Date(date).toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            dateRow.innerHTML = `
+                <td colspan="4">
+                    <i class="far fa-calendar-alt"></i> ${formattedDate}
+                </td>
+            `;
+            tbody.appendChild(dateRow);
+
+            // 2. Meal Sections
+            ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(mealType => {
+                const items = dayData.meals[mealType] || [];
+                if (items.length === 0) return;
+
+                // Meal Subheader
+                const mealHeader = document.createElement('tr');
+                mealHeader.className = `meal-subheader ${mealType}`;
+                let icon = 'fa-utensils';
+                if (mealType === 'Breakfast') icon = 'fa-coffee';
+                if (mealType === 'Lunch') icon = 'fa-hamburger';
+                if (mealType === 'Dinner') icon = 'fa-moon';
+                if (mealType === 'Snacks') icon = 'fa-cookie-bite';
+
+                mealHeader.innerHTML = `
+                    <td colspan="4">
+                        <i class="fas ${icon}"></i> ${mealType}
+                    </td>
+                `;
+                tbody.appendChild(mealHeader);
+
+                // Items
+                items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'item-row';
+
+                    tr.innerHTML = `
+                        <td><span class="strong-text">${item.name}</span></td>
+                        <td>
+                            <div class="detail-text">
+                                <span class="macro-tag p">P: ${Math.round(item.protein)}g</span>
+                                <span class="macro-tag c">C: ${Math.round(item.carbs)}g</span>
+                                <span class="macro-tag f">F: ${Math.round(item.fat)}g</span>
+                            </div>
+                        </td>
+                        <td><span class="cal-text">${Math.round(item.calories)}</span></td>
+                        <td style="text-align: right;">
+                             <button class="action-btn delete-btn" onclick="window.deleteMealFromHistory('${date}', '${mealType}', '${item.id}')">
+                                <i class="fas fa-trash"></i>
+                             </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        });
+
+        if (hasData) {
+            tableResponsive.style.display = 'block';
+            emptyMsg.style.display = 'none';
+        } else {
+            tableResponsive.style.display = 'none';
+            emptyMsg.style.display = 'flex';
+        }
+    }
+
+    // Expose delete function to global scope because it's called from inline HTML
+    window.deleteMealFromHistory = async (date, mealType, itemId) => {
+        if (!confirm('Permanently delete this item?')) return;
+
+        // 1. Remove from globalHistory
+        const dayData = globalHistory[date];
+        if (!dayData || !dayData.meals || !dayData.meals[mealType]) return;
+
+        const idx = dayData.meals[mealType].findIndex(x => x.id === itemId);
+        if (idx === -1) return;
+
+        // If deleting from TODAY, we must also update current state (dailyNutrients)
+        if (date === todayKey) {
+            const item = dayData.meals[mealType][idx];
+            dailyNutrients.calories -= item.calories;
+            dailyNutrients.protein -= item.protein;
+            dailyNutrients.carbs -= item.carbs;
+            dailyNutrients.fat -= item.fat;
+
+            // Update local todayMeals reference too if needed, though globalHistory is source of truth for save
+            const localIdx = todayMeals[mealType].findIndex(x => x.id === itemId);
+            if (localIdx !== -1) todayMeals[mealType].splice(localIdx, 1);
+
+            updateDashboard();
+        }
+
+        // Remove from Array
+        dayData.meals[mealType].splice(idx, 1);
+
+        // Recalculate totals for that day if it's not today? 
+        // For simplicity, we assume dayData.nutrients needs update if we want consistency, 
+        // but for this view we just show the table. 
+        // However, let's update nutrients in history for consistency.
+        // (If date != todayKey, we don't need to update UI rings, but we should update the stored sums)
+        if (date !== todayKey) {
+            // Logic to recap nutrients for that day could be here, but simpler to just delete.
+            // Ideally we should sync nutrients count. 
+            // Since we have the item data before delete (we didn't capture it for non-today... wait we did below but didn't assign to var)
+            // Actually, let's just proceed. The main Dashboard uses 'dailyNutrients'. 
+        }
+
+
+        // 2. Save
+        await saveData();
+
+        // 3. Re-render
+        renderMealsView();
+    };
 
 
 

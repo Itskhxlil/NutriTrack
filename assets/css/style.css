@@ -81,7 +81,7 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding-top: 1rem;
+    padding: 1.2rem 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -632,4 +632,218 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Data Table */
+.view-container {
+    padding: 0 1rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.4));
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 900px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1.5rem 1.5rem;
+    /* Increased vertical padding */
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: 0.2s;
+    vertical-align: middle;
+    line-height: 1.6;
+    /* Better line height */
+}
+
+.data-table th {
+    background: rgba(30, 41, 59, 0.6);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(5px);
+}
+
+.data-table th i {
+    margin-right: 8px;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+.data-table td {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.data-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-main);
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+
+.data-table .strong-text {
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+/* Date Group Header */
+.date-header {
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.date-header td {
+    color: var(--primary) !important;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+}
+
+.date-header i {
+    margin-right: 10px;
+}
+
+/* Macro Tags */
+.macro-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.macro-tag.p {
+    color: var(--secondary);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.macro-tag.c {
+    color: var(--accent);
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.macro-tag.f {
+    color: var(--fat-color);
+    border-color: rgba(250, 204, 21, 0.3);
+}
+
+.detail-text {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    /* Increased gap */
+}
+
+/* Calories Emphasis */
+.cal-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Meal Subheader */
+.meal-subheader td {
+    background: rgba(30, 41, 59, 0.4);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.meal-subheader i {
+    margin-right: 8px;
+    color: var(--secondary);
+}
+
+.meal-subheader.Breakfast i {
+    color: #facc15;
+}
+
+.meal-subheader.Lunch i {
+    color: #fb923c;
+}
+
+.meal-subheader.Dinner i {
+    color: #a78bfa;
+}
+
+.meal-subheader.Snacks i {
+    color: #2dd4bf;
+}
+
+/* Indent Items */
+.data-table tr.item-row td:first-child {
+    padding-left: 2.5rem;
+    position: relative;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.data-table tr.item-row td:first-child::before {
+    content: '';
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+/* Badges removed from columns */
+
+/* Buttons */
+.delete-btn {
+    opacity: 0.6;
+    transition: 0.2s;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.delete-btn:hover {
+    opacity: 1;
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+    transform: scale(1.1);
+}
+
+.empty-state {
+    padding: 4rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    border: 2px dashed rgba(255, 255, 255, 0.05);
+    margin-top: 20px;
 }

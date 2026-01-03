@@ -223,8 +223,26 @@
                         <h1>Your Meals</h1>
                     </div>
                 </header>
-                <div class="view-container" style="padding: 2rem; text-align: center; color: #94a3b8;">
-                    <p>Page Under Construction</p>
+                <div class="view-container">
+                    <div class="table-responsive">
+                        <table class="data-table" id="mealsTable">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hamburger"></i> Food Details</th>
+                                    <th><i class="fas fa-chart-pie"></i> Nutrition</th>
+                                    <th><i class="fas fa-fire"></i> Calories</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mealsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-meals-msg" class="empty-state" style="display:none;">
+                        <i class="fas fa-utensils" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>No meals added yet.</p>
+                    </div>
                 </div>
             </div>
 

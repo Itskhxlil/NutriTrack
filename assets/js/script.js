@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
         Snacks: []
     };
 
+    // New: Global History for JSON persistence
+    let globalHistory = {};
+
     // Goals (Static for now)
     const goals = {
         calories: 2000,
@@ -60,14 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayKey = getDatestamp();
     document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' });
 
-    try {
-        loadData();
-    } catch (err) {
+    loadData().catch(err => {
         console.error("Data Load Error:", err);
-        // Fallback: Clear potentially corrupted data if it causes crash
-        // localStorage.removeItem('nutriTrack_history'); 
-        // For now just log, to avoid deleting user data if it's just a minor bug.
-    }
+    });
 
     window.openFoodModal = (meal) => {
         currentMeal = meal;
@@ -292,36 +290,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Persistence ---
-    function saveData() {
-        const fullHistory = JSON.parse(localStorage.getItem('nutriTrack_history')) || {};
-
-        fullHistory[todayKey] = {
+    async function saveData() {
+        // Update global history with current state
+        globalHistory[todayKey] = {
             nutrients: dailyNutrients,
             meals: todayMeals,
             water: waterGlasses
         };
 
-        localStorage.setItem('nutriTrack_history', JSON.stringify(fullHistory));
+        try {
+            await fetch('data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(globalHistory)
+            });
+        } catch (err) {
+            console.error("Failed to save data:", err);
+        }
     }
 
-    function loadData() {
-        const fullHistory = JSON.parse(localStorage.getItem('nutriTrack_history')) || {};
-        const todayData = fullHistory[todayKey];
+    async function loadData() {
+        try {
+            const res = await fetch('data.php');
+            if (!res.ok) throw new Error('Failed to load data');
 
-        if (todayData) {
-            dailyNutrients = todayData.nutrients || dailyNutrients;
-            todayMeals = todayData.meals || todayMeals;
-            waterGlasses = todayData.water || 0;
+            globalHistory = await res.json();
+            const todayData = globalHistory[todayKey];
 
-            // Render UI
-            updateDashboard();
-            updateWaterUI();
+            if (todayData) {
+                dailyNutrients = todayData.nutrients || dailyNutrients;
+                todayMeals = todayData.meals || todayMeals;
+                waterGlasses = todayData.water || 0;
 
-            // Re-render lists
-            Object.keys(todayMeals).forEach(mealName => {
-                const items = todayMeals[mealName];
-                items.forEach(item => renderMealItem(mealName, item));
-            });
+                // Render UI
+                updateDashboard();
+                updateWaterUI();
+
+                // Re-render lists
+                Object.keys(todayMeals).forEach(mealName => {
+                    const items = todayMeals[mealName];
+                    items.forEach(item => renderMealItem(mealName, item));
+                });
+            }
+        } catch (err) {
+            console.error("Error loading data from server:", err);
+            // Optionally initialize empty history if file is missing/corrupt
+            globalHistory = {};
         }
     }
 

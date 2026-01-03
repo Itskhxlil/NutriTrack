@@ -1,43 +1,21 @@
 {
+    "settings": {
+        "calorieGoal": 10000,
+        "waterGoal": 8
+    },
     "2026-01-03": {
         "nutrients": {
-            "calories": 730,
-            "protein": 45,
-            "carbs": 10.8,
-            "fat": 53
+            "calories": 0,
+            "protein": 0,
+            "carbs": 0,
+            "fat": 0
         },
         "meals": {
             "Breakfast": [],
-            "Lunch": [
-                {
-                    "id": "1767443818326",
-                    "name": "Cheddar",
-                    "calories": 270,
-                    "protein": 9,
-                    "carbs": 6,
-                    "fat": 21
-                },
-                {
-                    "id": "1767444166190",
-                    "name": "Merguez V\u00e9g\u00e9tal",
-                    "calories": 220,
-                    "protein": 12,
-                    "carbs": 4.8,
-                    "fat": 16
-                }
-            ],
-            "Dinner": [
-                {
-                    "id": "1767444187242",
-                    "name": "Sardines \u00e0 l'huile d'olive",
-                    "calories": 240,
-                    "protein": 24,
-                    "carbs": 0,
-                    "fat": 16
-                }
-            ],
+            "Lunch": [],
+            "Dinner": [],
             "Snacks": []
         },
-        "water": 6
+        "water": 0
     }
 }

@@ -58,7 +58,7 @@
                     <div class="card calorie-card">
                         <div class="card-header">
                             <h3>Calories</h3>
-                            <span class="badge">Goal: 2000</span>
+                            <span class="badge">Goal: <span id="goalCalDisplay">2000</span></span>
                         </div>
                         <div class="ring-container">
                             <div class="ring">
@@ -137,7 +137,7 @@
                                 <div class="water-fill" id="waterFill"></div>
                             </div>
                             <div class="water-info">
-                                <span id="waterCount">0</span> / 8
+                                <span id="waterCount">0</span> / <span id="goalWaterDisplay">8</span>
                                 <small>Glasses</small>
                             </div>
                         </div>
@@ -253,8 +253,27 @@
                         <h1>Settings</h1>
                     </div>
                 </header>
-                <div class="view-container" style="padding: 2rem; text-align: center; color: #94a3b8;">
-                    <p>Page Under Construction</p>
+                <div class="view-container">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-bullseye"></i> Daily Goals</h3>
+                        <div class="setting-group">
+                            <label>Daily Calories Goal</label>
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="settingCalGoal"
+                                placeholder="2000">
+                        </div>
+                        <div class="setting-group">
+                            <label>Daily Water Goal (Glasses)</label>
+                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="settingWaterGoal"
+                                placeholder="8">
+                        </div>
+                        <button class="save-settings-btn" id="saveSettingsBtn">Save Changes</button>
+                    </div>
+
+                    <div class="settings-card danger-zone">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                        <p>This will permanently delete all your tracking history and reset the app.</p>
+                        <button class="reset-data-btn" id="resetDataBtn">Reset All Data</button>
+                    </div>
                 </div>
             </div>
         </main>

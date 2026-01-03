@@ -825,6 +825,103 @@ body {
 
 /* Badges removed from columns */
 
+/* Settings Page */
+.settings-card {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2rem;
+}
+
+.settings-card h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-group {
+    margin-bottom: 1.5rem;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+}
+
+.setting-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.4) !important;
+    /* Darker background */
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 10px;
+    color: #ffffff !important;
+    /* Force white text */
+    outline: none;
+    font-size: 1rem;
+    position: relative;
+    /* Ensure it's on top */
+    z-index: 10;
+    cursor: text;
+}
+
+.setting-group input:focus {
+    border-color: var(--primary);
+}
+
+.save-settings-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.save-settings-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Danger Zone */
+.settings-card.danger-zone {
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.settings-card.danger-zone h3 {
+    color: var(--danger);
+}
+
+.settings-card.danger-zone p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.reset-data-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.reset-data-btn:hover {
+    background: var(--danger);
+    color: white;
+}
+
 /* Buttons */
 .delete-btn {
     opacity: 0.6;

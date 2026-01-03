@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // New: Global History for JSON persistence
     let globalHistory = {};
 
-    // Goals (Static for now)
-    const goals = {
+    // Goals (Mutable)
+    let goals = {
         calories: 2000,
         protein: 150,
         carbs: 200,
         fat: 70
     };
+    let waterGoal = 8;
 
     const perimeter = 339.292; // 2 * pi * 54
 
@@ -267,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update Calories
         document.getElementById('calConsumed').innerText = Math.round(dailyNutrients.calories);
         document.getElementById('calRemaining').innerText = Math.max(0, goals.calories - Math.round(dailyNutrients.calories));
+        document.getElementById('goalCalDisplay').innerText = goals.calories;
 
         // Update Ring
         const percent = Math.min(dailyNutrients.calories / goals.calories, 1);
@@ -291,7 +293,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Persistence ---
     async function saveData() {
-        // Update global history with current state
+        // 1. Update Settings
+        if (globalHistory.settings) {
+            globalHistory.settings = {
+                calorieGoal: goals.calories,
+                waterGoal: waterGoal
+            };
+        } else {
+            globalHistory.settings = {
+                calorieGoal: goals.calories,
+                waterGoal: waterGoal
+            };
+        }
+
+        // 2. Update Daily Progress
         globalHistory[todayKey] = {
             nutrients: dailyNutrients,
             meals: todayMeals,
@@ -313,10 +328,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadData() {
         try {
-            const res = await fetch('data.php');
+            // Add timestamp to prevent caching
+            const res = await fetch(`data.php?t=${Date.now()}`);
             if (!res.ok) throw new Error('Failed to load data');
 
             globalHistory = await res.json();
+
+            // Load Settings
+            if (globalHistory.settings) {
+                if (globalHistory.settings.calorieGoal) goals.calories = globalHistory.settings.calorieGoal;
+                if (globalHistory.settings.waterGoal) waterGoal = globalHistory.settings.waterGoal;
+            }
+
             const todayData = globalHistory[todayKey];
 
             if (todayData) {
@@ -324,26 +347,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 todayMeals = todayData.meals || todayMeals;
                 waterGlasses = todayData.water || 0;
 
-                // Render UI
-                updateDashboard();
-                updateWaterUI();
-
                 // Re-render lists
                 Object.keys(todayMeals).forEach(mealName => {
                     const items = todayMeals[mealName];
                     items.forEach(item => renderMealItem(mealName, item));
                 });
             }
+
+            // Always update UI (even if no data, to show correct Goals)
+            updateDashboard();
+            updateWaterUI();
+
         } catch (err) {
             console.error("Error loading data from server:", err);
             // Optionally initialize empty history if file is missing/corrupt
             globalHistory = {};
+            // Still render UI defaults
+            updateDashboard();
         }
     }
 
     // Water Logic
     let waterGlasses = 0;
-    const waterGoal = 8;
+    // waterGoal is now global
     const addWaterBtn = document.getElementById('addWaterBtn');
     const resetWaterBtn = document.getElementById('resetWaterBtn');
     const waterFill = document.getElementById('waterFill');
@@ -365,6 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateWaterUI() {
         waterCount.innerText = waterGlasses;
+        document.getElementById('goalWaterDisplay').innerText = waterGoal;
         const percent = (waterGlasses / waterGoal) * 100;
         waterFill.style.height = `${percent}%`;
 
@@ -433,6 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (viewName === 'settings') {
             if (settingsView) settingsView.style.display = 'block';
             if (navSettings) navSettings.classList.add('active');
+            renderSettingsView();
         }
     }
 
@@ -587,5 +615,55 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
+
+
+    // --- Settings View Logic ---
+    function renderSettingsView() {
+        document.getElementById('settingCalGoal').value = goals.calories;
+        document.getElementById('settingWaterGoal').value = waterGoal;
+    }
+
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.onclick = async () => {
+            const newCal = parseInt(document.getElementById('settingCalGoal').value);
+            const newWater = parseInt(document.getElementById('settingWaterGoal').value);
+
+            if (newCal > 0) goals.calories = newCal;
+            if (newWater > 0) waterGoal = newWater;
+
+            // Recalculate derived macros (simplified ratio)
+            // Assuming 30% Protein, 40% Carbs, 30% Fat roughly or keep fixed ratio
+            // For now, let's scale macros based on new calories vs 2000 base
+            const ratio = goals.calories / 2000;
+            goals.protein = Math.round(150 * ratio);
+            goals.carbs = Math.round(200 * ratio);
+            goals.fat = Math.round(70 * ratio);
+
+            await saveData();
+            updateDashboard();
+            updateWaterUI();
+            alert('Settings Saved!');
+        };
+    }
+
+    const resetDataBtn = document.getElementById('resetDataBtn');
+    if (resetDataBtn) {
+        resetDataBtn.onclick = async () => {
+            if (confirm('WARNING: This will delete ALL your history. Are you sure?')) {
+                // Reset all in-memory state
+                globalHistory = {};
+                dailyNutrients = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+                todayMeals = { Breakfast: [], Lunch: [], Dinner: [], Snacks: [] };
+                waterGlasses = 0;
+                goals = { calories: 2000, protein: 150, carbs: 200, fat: 70 };
+                waterGoal = 8;
+
+                // Save the clean state
+                await saveData();
+                location.reload();
+            }
+        };
+    }
 
 });

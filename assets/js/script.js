@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // New: Search Results container (dynamically created if not present, though we added it in HTML)
     const searchResults = document.getElementById('searchResults');
 
-    // State
-    let currentMeal = null;
-    let debounceTimer;
+    // State Management
+    let currentMeal = null; // Currently selected meal type for adding food
+    let debounceTimer; // Timer for search input debounce
     let currentFoodItem = {
         name: '',
         calories: 0,
@@ -78,10 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
         foodSearchInput.focus();
     };
 
-    closeBtn.onclick = () => modal.style.display = 'none';
-    window.onclick = (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    };
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        searchResults.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            searchResults.style.display = 'none';
+        }
+    });
 
     // Hide results on click outside
     document.addEventListener('click', (e) => {
@@ -228,7 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Note: Edit is a bit complex with ID persistence, so keeping it simple: Delete & Re-add.
         // If we want edit, we need to update the array. For now supporting delete is good.
-        li.querySelector('.delete-btn').onclick = () => deleteFoodItem(mealName, item.id, li);
+        const delBtn = li.querySelector('.delete-btn');
+        delBtn.addEventListener('click', () => deleteFoodItem(mealName, item.id, li));
 
         list.appendChild(li);
     }
@@ -546,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </td>
                         <td><span class="cal-text">${Math.round(item.calories)}</span></td>
                         <td style="text-align: right;">
-                             <button class="action-btn delete-btn" onclick="window.deleteMealFromHistory('${date}', '${mealType}', '${item.id}')">
+                             <button class="action-btn delete-btn" data-date="${date}" data-meal-type="${mealType}" data-id="${item.id}">
                                 <i class="fas fa-trash"></i>
                              </button>
                         </td>
@@ -565,8 +573,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Expose delete function to global scope because it's called from inline HTML
-    window.deleteMealFromHistory = async (date, mealType, itemId) => {
+    // Event Delegation for Delete Button in Meals Table
+    document.getElementById('mealsTableBody').addEventListener('click', (e) => {
+        const btn = e.target.closest('.delete-btn');
+        if (!btn) return;
+
+        const date = btn.getAttribute('data-date');
+        const mealType = btn.getAttribute('data-meal-type');
+        const itemId = btn.getAttribute('data-id');
+
+        if (date && mealType && itemId) {
+            deleteMealFromHistory(date, mealType, itemId);
+        }
+    });
+
+    async function deleteMealFromHistory(date, mealType, itemId) {
         if (!confirm('Permanently delete this item?')) return;
 
         // 1. Remove from globalHistory
@@ -594,25 +615,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove from Array
         dayData.meals[mealType].splice(idx, 1);
 
-        // Recalculate totals for that day if it's not today? 
-        // For simplicity, we assume dayData.nutrients needs update if we want consistency, 
-        // but for this view we just show the table. 
-        // However, let's update nutrients in history for consistency.
-        // (If date != todayKey, we don't need to update UI rings, but we should update the stored sums)
-        if (date !== todayKey) {
-            // Logic to recap nutrients for that day could be here, but simpler to just delete.
-            // Ideally we should sync nutrients count. 
-            // Since we have the item data before delete (we didn't capture it for non-today... wait we did below but didn't assign to var)
-            // Actually, let's just proceed. The main Dashboard uses 'dailyNutrients'. 
-        }
-
-
         // 2. Save
         await saveData();
 
         // 3. Re-render
         renderMealsView();
-    };
+    }
 
 
 

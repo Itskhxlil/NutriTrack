@@ -944,3 +944,130 @@ body {
     border: 2px dashed rgba(255, 255, 255, 0.05);
     margin-top: 20px;
 }
+
+/* REPORTS SECTION STYLES */
+.reports-scroll-container {
+    padding: 0 1rem;
+    padding-bottom: 2rem;
+}
+
+.reports-section h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Reports Grid */
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.report-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    background: rgba(30, 41, 59, 0.8);
+}
+
+.report-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: var(--primary);
+    transition: 0.3s;
+}
+
+.report-card:hover .report-icon {
+    background: var(--primary);
+    color: white;
+}
+
+.report-info h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: var(--text-main);
+}
+
+.report-info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Videos Grid */
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.video-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+}
+
+.video-placeholder {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.video-placeholder i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.2);
+    transition: 0.3s;
+}
+
+.video-card:hover .video-placeholder i {
+    color: #ef4444;
+    /* Youtube red */
+    transform: scale(1.1);
+}
+
+.video-info {
+    padding: 1rem;
+}
+
+.video-info h4 {
+    font-size: 1rem;
+    color: var(--text-main);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

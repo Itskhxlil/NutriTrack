@@ -17,5 +17,29 @@
             "Snacks": []
         },
         "water": 0
+    },
+    "2026-01-11": {
+        "nutrients": {
+            "calories": 409,
+            "protein": 22.4,
+            "carbs": 51.1,
+            "fat": 11.1
+        },
+        "meals": {
+            "Breakfast": [
+                {
+                    "id": "1768134038512",
+                    "name": "GH EIN 109 PROTEIN novo protein Cops sweet chilli",
+                    "calories": 409,
+                    "protein": 22.4,
+                    "carbs": 51.1,
+                    "fat": 11.1
+                }
+            ],
+            "Lunch": [],
+            "Dinner": [],
+            "Snacks": []
+        },
+        "water": 0
     }
 }
